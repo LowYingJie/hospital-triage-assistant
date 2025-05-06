@@ -4,31 +4,40 @@ import json
 from prompts import build_prompt
 from utils.translator import translate_text
 from utils.db_logger import init_db, log_triage
+
+# Initialize DB
 init_db()
+
+# Load API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-# Parse urgency & action from the result (simplified, use regex if needed)
-urgency = "Medium" if "Medium" in result else ("High" if "High" in result else "Low")
-action = "ER" if "ER" in result else ("Self-care" if "Self-care" in result else "Clinic")
 
-log_triage(symptoms, urgency, action, language)
+# Set up Streamlit page
 st.set_page_config(page_title="AI Triage Assistant", layout="centered")
+st.title("🏥 AI Triage Assistant for Public Hospitals")
 
-# Load hospital data
+# Load hospital ER data
 with open("data/hospital_status.json", "r") as f:
     hospital_status = json.load(f)
 
-st.title("🏥 AI Triage Assistant for Public Hospitals")
-
+# Collect user input
 language = st.selectbox("Choose Language", ["English", "Malay", "Mandarin", "Tamil"])
 literacy = st.radio("Select Literacy Level", ["Simple", "Advanced"])
 
-symptoms = st.text_area("Describe your symptoms:")
+st.markdown("**Or use your microphone to describe symptoms:**")
+symptoms = st.text_area("Describe your symptoms (or paste from mic):", placeholder="e.g. Chest pain for 2 hours")
+st.markdown("""
+> 🗣️ On mobile, use the mic button on your keyboard.  
+> On desktop Chrome, enable speech-to-text in browser settings.
+""")
+
 history = st.text_input("Medical history (if any):")
 allergies = st.text_input("Allergies (if any):")
 
+# Read simulated ER status
 er_status = hospital_status.get("ER_Load", "Moderate")
 queue_time = hospital_status.get("QueueTime_Minutes", 45)
 
+# Response section
 if st.button("Estimate Urgency"):
     with st.spinner("Analyzing..."):
         full_prompt = build_prompt(
@@ -46,13 +55,14 @@ if st.button("Estimate Urgency"):
 
         result = response['choices'][0]['message']['content']
         translated = translate_text(result, target_lang=language)
-st.markdown("**Or use your microphone to describe symptoms:**")
-symptoms = st.text_area("Describe your symptoms (or paste from mic):", placeholder="e.g. Chest pain for 2 hours")
 
-# Use browser voice input (for now, user can dictate into voice-to-text input on mobile or desktop)
-st.markdown("""
-> 🗣️ On mobile, use the mic button on your keyboard.
-> On desktop Chrome, you can enable speech-to-text from browser settings.
-""")
+        # Extract urgency level and recommended action (very basic parsing)
+        urgency = "Medium" if "Medium" in result else ("High" if "High" in result else "Low")
+        action = "ER" if "ER" in result else ("Self-care" if "Self-care" in result else "Clinic")
+
+        # Log the triage session
+        log_triage(symptoms, urgency, action, language)
+
+        # Display result
         st.markdown("### 🩺 Recommendation:")
         st.success(translated)
