@@ -6,7 +6,10 @@ import altair as alt
 st.set_page_config(page_title="Hospital Admin Dashboard")
 
 st.title("🏥 Triage Admin Dashboard")
-
+password = st.text_input("Enter Password", type="password")
+if password != "your-secure-password":
+    st.warning("Incorrect password!")
+    st.stop()  # This will stop execution of the dashboard
 # Load DB
 conn = sqlite3.connect("triage_log.db")
 df = pd.read_sql_query("SELECT * FROM triage_logs ORDER BY timestamp DESC", conn)
