@@ -5,6 +5,9 @@ from prompts import build_prompt
 from utils.translator import translate_text
 from utils.db_logger import init_db, log_triage
 
+# Set the Streamlit page configuration first
+st.set_page_config(page_title="AI Triage Assistant", layout="centered")
+
 # Initialize database
 init_db()
 
@@ -21,9 +24,6 @@ try:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 except FileNotFoundError:
     st.warning("Custom style not loaded — styles.css not found.")
-
-# Set the page configuration for Streamlit
-st.set_page_config(page_title="AI Triage Assistant", layout="centered")
 
 # Page title
 st.title("🏥 AI Triage Assistant for Public Hospitals")
