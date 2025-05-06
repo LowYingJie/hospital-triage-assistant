@@ -1,35 +1,47 @@
 import streamlit as st
-import sqlite3
 import pandas as pd
-import altair as alt
+import sqlite3
+import os
 
-st.set_page_config(page_title="Hospital Admin Dashboard")
+st.set_page_config(page_title="Admin Dashboard", layout="wide")
+st.title("📊 Hospital Admin Dashboard - Triage Overview")
 
-st.title("🏥 Triage Admin Dashboard")
-password = st.text_input("Enter Password", type="password")
-if password != "your-secure-password":
-    st.warning("Incorrect password!")
-    st.stop()  # This will stop execution of the dashboard
-# Load DB
-conn = sqlite3.connect("triage_log.db")
-df = pd.read_sql_query("SELECT * FROM triage_logs ORDER BY timestamp DESC", conn)
+# Check if database exists
+db_path = "triage_log.db"
 
-# Metrics
-st.metric("Total Triage Sessions", len(df))
-st.metric("Average Queue Time", "90 mins (simulated)")
-st.metric("Languages Used", df["language"].nunique())
+if os.path.exists(db_path):
+    conn = sqlite3.connect(db_path)
+    df = pd.read_sql_query("SELECT * FROM triage_logs ORDER BY timestamp DESC", conn)
+    conn.close()
+else:
+    st.warning("No triage database found. Showing sample data.")
+    # Sample fallback DataFrame
+    df = pd.DataFrame({
+        "timestamp": ["2025-05-06 10:00", "2025-05-06 11:00"],
+        "symptoms": ["Headache", "Fever and chills"],
+        "urgency": ["Low", "High"],
+        "action": ["Self-care", "ER"],
+        "language": ["English", "Malay"]
+    })
 
-# Pie chart of urgency
-chart = alt.Chart(df).mark_arc().encode(
-    theta=alt.Theta(field="count", type="quantitative"),
-    color=alt.Color(field="urgency", type="nominal"),
-).transform_aggregate(
-    count='count()',
-    groupby=["urgency"]
-)
+# Filter by urgency or language
+urgency_filter = st.multiselect("Filter by Urgency", df['urgency'].unique())
+language_filter = st.multiselect("Filter by Language", df['language'].unique())
 
-st.altair_chart(chart, use_container_width=True)
+filtered_df = df.copy()
+if urgency_filter:
+    filtered_df = filtered_df[filtered_df["urgency"].isin(urgency_filter)]
+if language_filter:
+    filtered_df = filtered_df[filtered_df["language"].isin(language_filter)]
 
-# Latest logs
-st.subheader("📋 Recent Triage Logs")
-st.dataframe(df[['timestamp', 'symptoms', 'urgency', 'action', 'language']])
+# Show filtered table
+st.dataframe(filtered_df, use_container_width=True)
+
+# Summary metrics
+st.markdown("### 📈 Summary")
+st.metric("Total Cases", len(df))
+st.metric("High Urgency", (df["urgency"] == "High").sum())
+st.metric("ER Referrals", (df["action"] == "ER").sum())
+
+# Visual
+st.bar_chart(df["urgency"].value_counts())
