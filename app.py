@@ -41,6 +41,13 @@ if st.button("Estimate Urgency"):
 
         result = response['choices'][0]['message']['content']
         translated = translate_text(result, target_lang=language)
+st.markdown("**Or use your microphone to describe symptoms:**")
+symptoms = st.text_area("Describe your symptoms (or paste from mic):", placeholder="e.g. Chest pain for 2 hours")
 
+# Use browser voice input (for now, user can dictate into voice-to-text input on mobile or desktop)
+st.markdown("""
+> 🗣️ On mobile, use the mic button on your keyboard.
+> On desktop Chrome, you can enable speech-to-text from browser settings.
+""")
         st.markdown("### 🩺 Recommendation:")
         st.success(translated)
