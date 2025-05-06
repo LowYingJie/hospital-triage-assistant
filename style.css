@@ -1,0 +1,30 @@
+/* styles.css */
+
+body {
+    background-image: url("https://images.unsplash.com/photo-1588776814546-ec7fef3f5978");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.main {
+    background-color: rgba(255, 255, 255, 0.90);  /* white with transparency */
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 800px;
+    margin: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+h1, h2, h3 {
+    color: #003366;
+}
+
+.stTextInput > label,
+.stTextArea > label,
+.stSelectbox > label,
+.stRadio > label {
+    font-weight: bold;
+    font-size: 16px;
+}
