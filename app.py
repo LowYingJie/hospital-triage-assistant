@@ -3,9 +3,14 @@ import openai
 import json
 from prompts import build_prompt
 from utils.translator import translate_text
-
+from utils.db_logger import init_db, log_triage
+init_db()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Parse urgency & action from the result (simplified, use regex if needed)
+urgency = "Medium" if "Medium" in result else ("High" if "High" in result else "Low")
+action = "ER" if "ER" in result else ("Self-care" if "Self-care" in result else "Clinic")
 
+log_triage(symptoms, urgency, action, language)
 st.set_page_config(page_title="AI Triage Assistant", layout="centered")
 
 # Load hospital data
