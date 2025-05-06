@@ -1,0 +1,6 @@
+{
+  "ER_Load": "High",
+  "QueueTime_Minutes": 90,
+  "AvailableBeds": 3,
+  "AvailableDoctors": 4
+}
