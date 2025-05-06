@@ -20,11 +20,17 @@ st.markdown("""
         font-weight: 600;
     }
 </style>
-""", unsafe_allow_html=True)
+
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    st.markdown('<div class="main">', unsafe_allow_html=True)
+
+# --- Your app content here ---
 st.title("🏥 AI Triage Assistant")
-st.caption("Designed for Public Hospitals in Malaysia — multilingual, low-literacy friendly")
+# ... form inputs, etc.
+
+st.markdown('</div>', unsafe_allow_html=True)
+
 
 # ---------------- Language & Literacy ---------------- #
 st.subheader("🌐 Language & Literacy")
