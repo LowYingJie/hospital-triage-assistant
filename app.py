@@ -6,7 +6,7 @@ from utils.translator import translate_text
 from utils.db_logger import init_db, log_triage
 
 # Load the OpenAI API key from Streamlit secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]["key"]
+openai.api_key = st.secrets["OPENAI_API_KEY"]["your_openai_api_key_here"]
 
 # Set the Streamlit page configuration first
 st.set_page_config(page_title="AI Triage Assistant", layout="centered")
